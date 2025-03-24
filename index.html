@@ -106,7 +106,7 @@
         <input type="text" id="scan-input" placeholder="Enter URL" style="width: 300px;">
         <button onclick="scanUrl()">Scan</button>
         <div id="scan-result"></div>
-        <p>Any score 30 or over is considered to be a probable cause for caution.</p>
+        <p>Any score over 30 is considered to be a probable cause for caution.</p>
     </div>
 
     <div id="password" class="content">
@@ -552,32 +552,39 @@ function filterPorts() {
         ];
 
         const suspiciousKeywords = [
-            'login', 'secure', 'update', 'verify', 'account', 'signin', 'password', 'payment',
-            'gift-card', 'offer', 'credit', 'free', 'bonus', 'survey', 'click', 'win', 'cash',
-            'claim', 'help', 'support', 'confirm', 'enter', 'unlock', 'prize', 'check',
-            'alert', 'safety', 'verify-account', 'risk-free', 'trial', 'subscription', 'download',
-            'install', 'apply', 'confirm-email', 'limited-time', 'act-now', 'fake', 'scam',
-            'unsecured', 'non-secure', 'fake-offer', 'unauthorized', 'exclusive', 'restricted',
-            'urgent', 'critical', 'banking', 'refundable', 'error', 'immediately', 'action-required',
-            'update-now', 'account-alert', 'recovery', 'password-reset', 'locked-account',
-            'account-suspended', 'free-gift', 'tax-refund', 'account-breach', 'secure-login',
-            'account-recovery', 'withdrawal', 'deposit', 'you-won', 'reward', 'exclusive-offer',
-            'prize-claim', 'giftvoucher', 'contest', 'login-page', 'withdraw', 'form-submission',
-            'alert-claim', 'money-back', 'data-breach', 'phishing', 'cash-out', 'fake-site',
-            'cloning', 'money-laundering', 'you-are-winner', 'account-deactivation', 'refund-request',
-            'notification', 'social-engineering', 'security-breach', 'alert-link', 'authorized-access',
-            'user-id', 'fake-login', 'password-theft', 'get-rich', 'hoax', 'card-details', 'download-link',
-            'net-income', 'unlimited-access', 'online-casino', 'fake-check', 'special-offer',
-            'money-transfer', 'limited-offer', 'investment-scheme', 'free-trial', 'blockchain-scam',
-            'fake-news', 'survey-link', 'malware-link', 'fraud', 'hacked', 'stolen-info',
-            'unauthorized-transaction', 'fake-website', 'unauthorized-action', 'verify-info',
-            'pay-now', 'redemption', 'contest-winning', 'earn-money', 'exploits', 'money-making-scheme',
-            'fake-prize', 'donate-now', 'scam-site', 'hoax-claim', 'cashback', 'invalid-account',
-            'warning', 'blocked', 'secure-your-account', 'immediate-response', 'urgent-message',
-            'fraudulent', 'reclaim-money', 'fake-identity', 'check-status'
+        'login', 'secure', 'update', 'verify', 'account', 'signin', 'password', 'payment',
+    'gift-card', 'offer', 'credit', 'free', 'bonus', 'survey', 'click', 'win', 'cash',
+    'claim', 'help', 'support', 'confirm', 'enter', 'unlock', 'prize', 'check',
+    'alert', 'safety', 'verify-account', 'risk-free', 'trial', 'subscription', 'download',
+    'install', 'apply', 'confirm-email', 'limited-time', 'act-now', 'fake', 'scam',
+    'unsecured', 'non-secure', 'fake-offer', 'unauthorized', 'exclusive', 'restricted',
+    'urgent', 'critical', 'banking', 'refundable', 'error', 'immediately', 'action-required',
+    'update-now', 'account-alert', 'recovery', 'password-reset', 'locked-account',
+    'account-suspended', 'free-gift', 'tax-refund', 'account-breach', 'secure-login',
+    'account-recovery', 'withdrawal', 'deposit', 'you-won', 'reward', 'exclusive-offer',
+    'prize-claim', 'giftvoucher', 'contest', 'login-page', 'withdraw', 'form-submission',
+    'alert-claim', 'money-back', 'data-breach', 'phishing', 'cash-out', 'fake-site',
+    'cloning', 'money-laundering', 'you-are-winner', 'account-deactivation', 'refund-request',
+    'notification', 'social-engineering', 'security-breach', 'alert-link', 'authorized-access',
+    'user-id', 'fake-login', 'password-theft', 'get-rich', 'hoax', 'card-details', 'download-link',
+    'net-income', 'unlimited-access', 'online-casino', 'fake-check', 'special-offer',
+    'money-transfer', 'limited-offer', 'investment-scheme', 'free-trial', 'blockchain-scam',
+    'fake-news', 'survey-link', 'malware-link', 'fraud', 'hacked', 'stolen-info',
+    'unauthorized-transaction', 'fake-website', 'unauthorized-action', 'verify-info',
+    'pay-now', 'redemption', 'contest-winning', 'earn-money', 'exploits', 'money-making-scheme',
+    'fake-prize', 'donate-now', 'scam-site', 'hoax-claim', 'cashback', 'invalid-account',
+    'warning', 'blocked', 'secure-your-account', 'immediate-response', 'urgent-message',
+    'fraudulent', 'reclaim-money', 'fake-identity', 'check-status', 'bet', 'coupon', 'auth',
+    'verify-email', 'subscribe', 'renew', 'promotion', 'invest', 'redeem', 'claim-now',
+    'offer-claim', 'limited-time-offer', 'instant-win', 'free-credit', 'transaction-alert',
+    'secure-transaction', 'activation-link', 'payment-alert', 'quick-claim', 'urgent-notice',
+    'payment-verification', 'final-chance', 'alert-update', 'confirm-claim', 'immediate-claim',
+    'exclusive-deal', 'tax-claim', 'account-update', 'account-activation', 'account-confirmation',
+    'account-secure', 'account-locked', 'account-recovery', 'account-suspension', 'account-termination',
+    'account-warning'
         ];
 
-        // File handling (local storage simulation since FileSystem API is restricted)
+        // Malicious domains
         let blockedDomains = { domains: [
     "1000-rewards.xyz",
     "101nitro.com",
@@ -22550,7 +22557,7 @@ function filterPorts() {
 
             if (parsed.protocol === 'http:') risk += 40;
             if (!whitelistedDomains.includes(domain)) risk += 20;
-            suspiciousKeywords.forEach(keyword => {
+            suspiciousKeywords.forE6ach(keyword => {
                 if (fullUrl.includes(keyword)) risk += 30;
             });
             const knownDomains = ['google', 'yahoo', 'amazon', 'facebook', 'twitter'];
@@ -22560,12 +22567,26 @@ function filterPorts() {
         }
 
         function scanUrl() {
-            const url = document.getElementById('scan-input').value;
-            if (url) {
-                let risk = calculateRisk(url);
-                document.getElementById('scan-result').innerText = `Risk score: ${risk}`;
-                if (risk > 60) riskyLinks.push(url);
-                saveFiles();
+        const url = document.getElementById('scan-input').value;
+    
+        if (url) {
+            let risk = 0;
+
+            // Check if the URL matches any of the blocked domains
+            const urlDomain = new URL(url).hostname; // Extract the domain from the URL
+            if (BlockedDomains.includes(urlDomain)) {
+                risk = 100; // If the domain is in the BlockedDomains list, set risk to 100
+            } else {
+                risk = calculateRisk(url); // Otherwise, calculate the risk score normally
+            }
+
+            document.getElementById('scan-result').innerText = `Risk score: ${risk}`;
+        
+            if (risk > 60) {
+                riskyLinks.push(url);
+            }
+
+            saveFiles();
             }
         }
 
