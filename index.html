@@ -106,7 +106,7 @@
         <input type="text" id="scan-input" placeholder="Enter URL" style="width: 300px;">
         <button onclick="scanUrl()">Scan</button>
         <div id="scan-result"></div>
-        <p>Any score over 30 is considered to be a probable cause for caution.</p>
+        <p>Any score 30 or over is considered to be a probable cause for caution.</p>
     </div>
 
     <div id="password" class="content">
@@ -544,47 +544,78 @@ function filterPorts() {
         renderPorts(ports);
         // Whitelist and keywords
         const whitelistedDomains = [
-            'youtube.com', 'google.com', 'github.com', 'wikipedia.org',
-            'twitch.tv', 'twitter.com', 'facebook.com', 'instagram.com', 'reddit.com',
-            'amazon.com', 'yahoo.com', 'linkedin.com', 'microsoft.com', 'apple.com',
-            'steamcommunity.com', 'paypal.com', 'bankofamerica.com', 'ebay.com', 'etsy.com',
-            'spotify.com', 'netflix.com', 'dropbox.com', 'icloud.com', 'zoom.us'
-        ];
+    // Popular global sites
+    'youtube.com', 'google.com', 'github.com', 'wikipedia.org', 
+    'twitch.tv', 'twitter.com', 'facebook.com', 'instagram.com', 
+    'reddit.com', 'amazon.com', 'yahoo.com', 'linkedin.com', 
+    'microsoft.com', 'apple.com', 'steamcommunity.com', 'paypal.com', 
+    'bankofamerica.com', 'ebay.com', 'etsy.com', 'spotify.com', 
+    'netflix.com', 'dropbox.com', 'icloud.com', 'zoom.us',
+    
+    // Regional domains (country-specific)
+    'youtube.co.uk', 'youtube.ca', 'youtube.de', 'youtube.fr', 'youtube.in', 'youtube.com.au', 'youtube.co.jp',
+    'google.co.uk', 'google.ca', 'google.de', 'google.fr', 'google.in', 'google.com.au', 'google.co.jp',
+    'facebook.co.uk', 'facebook.ca', 'facebook.de', 'facebook.fr', 'facebook.in', 'facebook.com.au', 'facebook.co.jp',
+    'twitter.co.uk', 'twitter.ca', 'twitter.de', 'twitter.fr', 'twitter.in', 'twitter.com.au', 'twitter.co.jp',
+    'instagram.co.uk', 'instagram.ca', 'instagram.de', 'instagram.fr', 'instagram.in', 'instagram.com.au', 'instagram.co.jp',
+    'reddit.co.uk', 'reddit.ca', 'reddit.de', 'reddit.fr', 'reddit.in', 'reddit.com.au', 'reddit.co.jp',
+    'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr', 'amazon.in', 'amazon.com.au', 'amazon.co.jp',
+    'yahoo.co.uk', 'yahoo.ca', 'yahoo.de', 'yahoo.fr', 'yahoo.in', 'yahoo.com.au', 'yahoo.co.jp',
+    'linkedin.co.uk', 'linkedin.ca', 'linkedin.de', 'linkedin.fr', 'linkedin.in', 'linkedin.com.au', 'linkedin.co.jp',
+    'microsoft.co.uk', 'microsoft.ca', 'microsoft.de', 'microsoft.fr', 'microsoft.in', 'microsoft.com.au', 'microsoft.co.jp',
+    'apple.co.uk', 'apple.ca', 'apple.de', 'apple.fr', 'apple.in', 'apple.com.au', 'apple.co.jp',
+    'steamcommunity.co.uk', 'steamcommunity.ca', 'steamcommunity.de', 'steamcommunity.fr', 'steamcommunity.in', 'steamcommunity.com.au', 'steamcommunity.co.jp',
+    'paypal.co.uk', 'paypal.ca', 'paypal.de', 'paypal.fr', 'paypal.in', 'paypal.com.au', 'paypal.co.jp',
+    'bankofamerica.co.uk', 'bankofamerica.ca', 'bankofamerica.de', 'bankofamerica.fr', 'bankofamerica.in', 'bankofamerica.com.au', 'bankofamerica.co.jp',
+    'ebay.co.uk', 'ebay.ca', 'ebay.de', 'ebay.fr', 'ebay.in', 'ebay.com.au', 'ebay.co.jp',
+    'etsy.co.uk', 'etsy.ca', 'etsy.de', 'etsy.fr', 'etsy.in', 'etsy.com.au', 'etsy.co.jp',
+    'spotify.co.uk', 'spotify.ca', 'spotify.de', 'spotify.fr', 'spotify.in', 'spotify.com.au', 'spotify.co.jp',
+    'netflix.co.uk', 'netflix.ca', 'netflix.de', 'netflix.fr', 'netflix.in', 'netflix.com.au', 'netflix.co.jp',
+    'dropbox.co.uk', 'dropbox.ca', 'dropbox.de', 'dropbox.fr', 'dropbox.in', 'dropbox.com.au', 'dropbox.co.jp',
+    'icloud.co.uk', 'icloud.ca', 'icloud.de', 'icloud.fr', 'icloud.in', 'icloud.com.au', 'icloud.co.jp',
+    'zoom.co.uk', 'zoom.ca', 'zoom.de', 'zoom.fr', 'zoom.in', 'zoom.com.au', 'zoom.co.jp',
+
+    // Other commonly trusted services
+    'bbc.com', 'cnn.com', 'nytimes.com', 'bbc.co.uk', 'reuters.com', 'forbes.com', 'guardian.co.uk', 'wsj.com', 'theverge.com',
+    'aliexpress.com', 'walmart.com', 'bestbuy.com', 'target.com', 'costco.com', 'wayfair.com', 'homedepot.com',
+    'airbnb.com', 'uber.com', 'lyft.com', 'booking.com', 'expedia.com', 'trivago.com', 'skyscanner.net', 'kayak.com',
+
+    // Government websites (trusted by default)
+    'usa.gov', 'gov.uk', 'gov.ca', 'gov.au', 'gov.in', 'gov.fr', 'gov.de', 'gov.jp',
+    'un.org', 'who.int', 'europa.eu', 'canada.ca', 'gov.br', 'gov.sg', 'gov.za', 'gov.cn',
+    'nsw.gov.au', 'vic.gov.au', 'act.gov.au', 'qld.gov.au',
+
+    // More popular services
+    'zoom.com', 'tiktok.com', 'snapchat.com', 'pinterest.com', 'flickr.com', 'vimeo.com', 'spotify.com', 'soundcloud.com'
+];
 
         const suspiciousKeywords = [
-        'login', 'secure', 'update', 'verify', 'account', 'signin', 'password', 'payment',
-    'gift-card', 'offer', 'credit', 'free', 'bonus', 'survey', 'click', 'win', 'cash',
-    'claim', 'help', 'support', 'confirm', 'enter', 'unlock', 'prize', 'check',
-    'alert', 'safety', 'verify-account', 'risk-free', 'trial', 'subscription', 'download',
-    'install', 'apply', 'confirm-email', 'limited-time', 'act-now', 'fake', 'scam',
-    'unsecured', 'non-secure', 'fake-offer', 'unauthorized', 'exclusive', 'restricted',
-    'urgent', 'critical', 'banking', 'refundable', 'error', 'immediately', 'action-required',
-    'update-now', 'account-alert', 'recovery', 'password-reset', 'locked-account',
-    'account-suspended', 'free-gift', 'tax-refund', 'account-breach', 'secure-login',
-    'account-recovery', 'withdrawal', 'deposit', 'you-won', 'reward', 'exclusive-offer',
-    'prize-claim', 'giftvoucher', 'contest', 'login-page', 'withdraw', 'form-submission',
-    'alert-claim', 'money-back', 'data-breach', 'phishing', 'cash-out', 'fake-site',
-    'cloning', 'money-laundering', 'you-are-winner', 'account-deactivation', 'refund-request',
-    'notification', 'social-engineering', 'security-breach', 'alert-link', 'authorized-access',
-    'user-id', 'fake-login', 'password-theft', 'get-rich', 'hoax', 'card-details', 'download-link',
-    'net-income', 'unlimited-access', 'online-casino', 'fake-check', 'special-offer',
-    'money-transfer', 'limited-offer', 'investment-scheme', 'free-trial', 'blockchain-scam',
-    'fake-news', 'survey-link', 'malware-link', 'fraud', 'hacked', 'stolen-info',
-    'unauthorized-transaction', 'fake-website', 'unauthorized-action', 'verify-info',
-    'pay-now', 'redemption', 'contest-winning', 'earn-money', 'exploits', 'money-making-scheme',
-    'fake-prize', 'donate-now', 'scam-site', 'hoax-claim', 'cashback', 'invalid-account',
-    'warning', 'blocked', 'secure-your-account', 'immediate-response', 'urgent-message',
-    'fraudulent', 'reclaim-money', 'fake-identity', 'check-status', 'bet', 'coupon', 'auth',
-    'verify-email', 'subscribe', 'renew', 'promotion', 'invest', 'redeem', 'claim-now',
-    'offer-claim', 'limited-time-offer', 'instant-win', 'free-credit', 'transaction-alert',
-    'secure-transaction', 'activation-link', 'payment-alert', 'quick-claim', 'urgent-notice',
-    'payment-verification', 'final-chance', 'alert-update', 'confirm-claim', 'immediate-claim',
-    'exclusive-deal', 'tax-claim', 'account-update', 'account-activation', 'account-confirmation',
-    'account-secure', 'account-locked', 'account-recovery', 'account-suspension', 'account-termination',
-    'account-warning'
+            'login', 'secure', 'update', 'verify', 'account', 'signin', 'password', 'payment',
+            'gift-card', 'offer', 'credit', 'free', 'bonus', 'survey', 'click', 'win', 'cash',
+            'claim', 'help', 'support', 'confirm', 'enter', 'unlock', 'prize', 'check',
+            'alert', 'safety', 'verify-account', 'risk-free', 'trial', 'subscription', 'download',
+            'install', 'apply', 'confirm-email', 'limited-time', 'act-now', 'fake', 'scam',
+            'unsecured', 'non-secure', 'fake-offer', 'unauthorized', 'exclusive', 'restricted',
+            'urgent', 'critical', 'banking', 'refundable', 'error', 'immediately', 'action-required',
+            'update-now', 'account-alert', 'recovery', 'password-reset', 'locked-account',
+            'account-suspended', 'free-gift', 'tax-refund', 'account-breach', 'secure-login',
+            'account-recovery', 'withdrawal', 'deposit', 'you-won', 'reward', 'exclusive-offer',
+            'prize-claim', 'giftvoucher', 'contest', 'login-page', 'withdraw', 'form-submission',
+            'alert-claim', 'money-back', 'data-breach', 'phishing', 'cash-out', 'fake-site',
+            'cloning', 'money-laundering', 'you-are-winner', 'account-deactivation', 'refund-request',
+            'notification', 'social-engineering', 'security-breach', 'alert-link', 'authorized-access',
+            'user-id', 'fake-login', 'password-theft', 'get-rich', 'hoax', 'card-details', 'download-link',
+            'net-income', 'unlimited-access', 'online-casino', 'fake-check', 'special-offer',
+            'money-transfer', 'limited-offer', 'investment-scheme', 'free-trial', 'blockchain-scam',
+            'fake-news', 'survey-link', 'malware-link', 'fraud', 'hacked', 'stolen-info',
+            'unauthorized-transaction', 'fake-website', 'unauthorized-action', 'verify-info',
+            'pay-now', 'redemption', 'contest-winning', 'earn-money', 'exploits', 'money-making-scheme',
+            'fake-prize', 'donate-now', 'scam-site', 'hoax-claim', 'cashback', 'invalid-account',
+            'warning', 'blocked', 'secure-your-account', 'immediate-response', 'urgent-message',
+            'fraudulent', 'reclaim-money', 'fake-identity', 'check-status'
         ];
 
-        // Malicious domains
+        // File handling (local storage simulation since FileSystem API is restricted)
         let blockedDomains = { domains: [
     "1000-rewards.xyz",
     "101nitro.com",
@@ -22557,36 +22588,27 @@ function filterPorts() {
 
             if (parsed.protocol === 'http:') risk += 40;
             if (!whitelistedDomains.includes(domain)) risk += 20;
-            suspiciousKeywords.forE6ach(keyword => {
+            suspiciousKeywords.forEach(keyword => {
                 if (fullUrl.includes(keyword)) risk += 30;
             });
-            const knownDomains = ['google', 'yahoo', 'amazon', 'facebook', 'twitter'];
-            if (knownDomains.some(k => domain.includes(k))) risk -= 10;
+
+            // Check if the domain is blocked
+            if (blockedDomains.domains.includes(domain)) {
+                console.log(`Blocked domain detected: ${domain}`);  // Debugging line
+                risk += 100;  // Assign 100 if the domain is blocked
+                alert("This domain has been detected by our team and exists in our blocked domains section. Do not interact with it!");
+            }
 
             return risk;
         }
 
         function scanUrl() {
-        const url = document.getElementById('scan-input').value;
-    
-        if (url) {
-            let risk = 0;
-
-            // Check if the URL matches any of the blocked domains
-            const urlDomain = new URL(url).hostname; // Extract the domain from the URL
-            if (BlockedDomains.includes(urlDomain)) {
-                risk = 100; // If the domain is in the BlockedDomains list, set risk to 100
-            } else {
-                risk = calculateRisk(url); // Otherwise, calculate the risk score normally
-            }
-
-            document.getElementById('scan-result').innerText = `Risk score: ${risk}`;
-        
-            if (risk > 60) {
-                riskyLinks.push(url);
-            }
-
-            saveFiles();
+            const url = document.getElementById('scan-input').value;
+            if (url) {
+                let risk = calculateRisk(url);
+                document.getElementById('scan-result').innerText = `Risk score: ${risk}`;
+                if (risk > 60) riskyLinks.push(url);
+                saveFiles();
             }
         }
 
