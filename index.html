@@ -65,23 +65,48 @@
             border-top: 1px solid #ccc;
             padding-top: 10px;
         }
+        select, input {
+            margin: 10px 0;
+            padding: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background: #007BFF;
+            color: white;
+        }
+        details {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h1>Phishing Authority</h1>
     <div class="tab-container">
         <div class="tab" onclick="showTab('scan')">Scan URL</div>
-        <div class="tab" onclick="showTab('password')">Password Generator</div>
-        <div class="tab" onclick="showTab('support')">Support</div>
         <div class="tab" onclick="showTab('blocked')">Blocked Domains</div>
         <div class="tab" onclick="showTab('risky')">Risky Links</div>
+        <div class="tab" onclick="showTab('ports')">Ports</div>
+        <div class="tab" onclick="showTab('news')">Cyber News</div>
+        <div class="tab" onclick="showTab('password')">Password Generator</div>
+        <div class="tab" onclick="showTab('support')">Support</div>
     </div>
 
     <div id="scan" class="content">
         <h2>Scan URL</h2>
+        <p>Enter the full link including http or https for example http://get-rich.com/you-are-winner/claim-now</p>
         <input type="text" id="scan-input" placeholder="Enter URL" style="width: 300px;">
         <button onclick="scanUrl()">Scan</button>
         <div id="scan-result"></div>
+        <p>Any score over 30 is considered to be a probable cause for caution.</p>
     </div>
 
     <div id="password" class="content">
@@ -160,12 +185,363 @@
         <h2>Risky Links Log</h2>
         <textarea id="risky-list" readonly></textarea>
     </div>
+    <div id="ports" class="content">
+        <h2>Ports Information</h2>
+        <label for="port-category">Select Category:</label>
+        <input type="text" id="search-port" placeholder="Search port..." onkeyup="searchPorts()" style="width: 300px; margin-top: 10px;">
+        <select id="port-category" onchange="filterPorts()">
+            <option value="all">All</option>
+            <option value="common">Commonly Used Ports</option>
+            <option value="malicious">Commonly Misused Ports</option>
+            <option value="blocked-home">Blocked Home</option>
+            <option value="blocked-education">Blocked Education</option>
+            <option value="blocked-work">Blocked Work</option>
+            <option value="blocked-public">Blocked Public</option>
+        </select>
+        <div id="port-list"></div>
+    </div>
+
+<div id="news" class="content">
+    <h2>Security News and Alerts</h2>
+    
+    <!-- News List -->
+    <div id="news-list">
+        <!-- News Articles will be inserted here dynamically -->
+    </div>
+</div>
 
     <div class="disclaimer">
         <p><strong>Disclaimer:</strong> This tool is designed to provide security recommendations and analysis based on URL risk factors. It does not guarantee 100% protection from phishing attacks. Use this tool at your own discretion, and always ensure proper online security practices.</p>
     </div>
 
     <script>
+// Hard-coded news articles with added date and image credit
+const newsArticles = [
+{
+    title: "Hackers Exploit New IoT Vulnerability to Access Smart Devices",
+    description: "A newly discovered vulnerability in Internet of Things (IoT) devices has been exploited by cybercriminals to gain unauthorized access to smart home gadgets. Experts are urging users to immediately update firmware to protect against potential threats.",
+    image: "https://c7.alamy.com/comp/PEPYE0/people-using-touch-screen-interfaces-augmented-reality-and-iot-devices-blockchain-of-things-and-networks-concept-PEPYE0.jpg",
+    date: "March 25, 2025",
+    imageCredit: "TechDaily News and Alarmy, used under Creative Commons License."
+},
+{
+    title: "Massive Data Breach Exposes Personal Information of Millions",
+    description: "A major data breach has compromised the personal information of millions of individuals, including social security numbers, emails, and bank account details. Authorities are working with affected companies to notify users and secure accounts.",
+    image: "https://media.istockphoto.com/id/1333874522/photo/hacker-attack-computer-hardware-microchip.jpg?s=612x612&w=0&k=20&c=SD8j9H_GtqbnuL4iz59yqZpnMku3SJRIMhwuC1rokqM=",
+    date: "March 24, 2025",
+    imageCredit: "InfoSec Times and IStock, used under Creative Commons License."
+},
+{
+    title: "Phishing Attack Mimics Government Emails to Steal Financial Data",
+    description: "A new wave of phishing attacks is targeting citizens by mimicking official government emails. The attackers are requesting personal financial information under the guise of providing stimulus payments. Users are advised to remain cautious and verify emails before responding.",
+    image: "https://media.istockphoto.com/id/956400244/vector/phishing-scam-hacker-attack.jpg?s=612x612&w=0&k=20&c=6adZZcKJdWO24xd05WH41Q362vGgny_w466y7Ds14Mk=",
+    date: "March 23, 2025",
+    imageCredit: "CyberNews Today and IStock, used under Creative Commons License."
+},
+{
+    title: "AI-Powered Malware Evades Traditional Antivirus Solutions",
+    description: "A new form of malware, powered by artificial intelligence, is increasingly evading traditional antivirus programs. Security researchers are warning businesses and individuals to upgrade to next-gen protection tools that incorporate AI-based threat detection systems.",
+    image: "https://www.shutterstock.com/image-photo/side-view-hacker-hoodie-using-laptop-2452475871",
+    date: "March 22, 2025",
+    imageCredit: "SecurityWatch and Shutterstock, used under Creative Commons License."
+},
+{
+    title: "Cybercriminals Target Cryptocurrency Wallets with New Ransomware",
+    description: "A new ransomware strain has emerged that specifically targets cryptocurrency wallets. The malware encrypts wallets and demands a ransom in digital assets to decrypt the funds. Experts suggest using multi-signature wallets for enhanced security.",
+    image: "https://www.shutterstock.com/image-photo/amsterdam-netherlands-august-30-2018-screenshot-1168020958",
+    date: "March 21, 2025",
+    imageCredit: "CoinSec News, used under Creative Commons License."
+}
+
+
+];
+
+// Function to display news
+function displayNews() {
+    const newsList = document.getElementById("news-list");
+    newsList.innerHTML = ''; // Clear the list before displaying new content
+
+    newsArticles.forEach(article => {
+        // Create article element
+        const articleDiv = document.createElement("div");
+        articleDiv.classList.add("news-article");
+
+        // Add title
+        const titleElement = document.createElement("h3");
+        titleElement.innerText = article.title;
+        articleDiv.appendChild(titleElement);
+
+        // Add date
+        const dateElement = document.createElement("p");
+        dateElement.classList.add("news-date");
+        dateElement.innerText = `Published on: ${article.date}`;
+        articleDiv.appendChild(dateElement);
+
+        // Add description
+        const descriptionElement = document.createElement("p");
+        descriptionElement.innerText = article.description;
+        articleDiv.appendChild(descriptionElement);
+
+        // Add image
+        if (article.image) {
+            const imageElement = document.createElement("img");
+            imageElement.src = article.image;
+            imageElement.alt = article.title;
+            imageElement.style.width = '100%'; // Make the image responsive
+            articleDiv.appendChild(imageElement);
+        }
+
+        // Add image credit
+        const imageCreditElement = document.createElement("p");
+        imageCreditElement.classList.add("image-credit");
+        imageCreditElement.innerHTML = `<strong>Credit: </strong> ${article.imageCredit}`;
+        articleDiv.appendChild(imageCreditElement);
+
+        // Append the article to the news list
+        newsList.appendChild(articleDiv);
+
+        // Add separator (black line)
+        const separator = document.createElement("hr");
+        separator.style.border = "1px solid black"; // Style the separator
+        newsList.appendChild(separator);
+    });
+}
+displayNews();
+        const ports = [
+            { number: 7, name: "Echo", category: "common", description: "Used for testing network connectivity by echoing back data." },
+            { number: 9, name: "Discard", category: "common", description: "Discards any data sent to it, used for testing." },
+            { number: 13, name: "Daytime", category: "common", description: "Returns the current date and time, used for testing." },
+            { number: 20, name: "FTP-DATA", category: "common", description: "File Transfer Protocol data channel." },
+            { number: 21, name: "FTP", category: "common", description: "File Transfer Protocol control channel." },
+            { number: 22, name: "SSH", category: "common", description: "Secure Shell for encrypted remote access." },
+            { number: 23, name: "Telnet", category: "malicious", description: "Unencrypted remote access, often exploited." },
+            { number: 25, name: "SMTP", category: "common", description: "Simple Mail Transfer Protocol for email sending." },
+            { number: 53, name: "DNS", category: "common", description: "Domain Name System for resolving domain names." },
+            { number: 67, name: "DHCP-Server", category: "common", description: "Dynamic Host Configuration Protocol server." },
+            { number: 68, name: "DHCP-Client", category: "common", description: "DHCP client communication." },
+            { number: 69, name: "TFTP", category: "common", description: "Trivial File Transfer Protocol, lightweight file transfer." },
+            { number: 80, name: "HTTP", category: "common", description: "HyperText Transfer Protocol for web traffic." },
+            { number: 88, name: "Kerberos", category: "common", description: "Authentication protocol for secure logins." },
+            { number: 110, name: "POP3", category: "common", description: "Post Office Protocol v3 for email retrieval." },
+            { number: 123, name: "NTP", category: "common", description: "Network Time Protocol for clock synchronization." },
+            { number: 135, name: "RPC", category: "malicious", description: "Remote Procedure Call, often targeted by exploits." },
+            { number: 139, name: "NetBIOS-SSN", category: "common", description: "NetBIOS Session Service for file/printer sharing." },
+            { number: 143, name: "IMAP", category: "common", description: "Internet Message Access Protocol for email." },
+            { number: 161, name: "SNMP", category: "common", description: "Simple Network Management Protocol for device monitoring." },
+            { number: 179, name: "BGP", category: "common", description: "Border Gateway Protocol for routing." },
+            { number: 389, name: "LDAP", category: "common", description: "Lightweight Directory Access Protocol for directory services." },
+            { number: 443, name: "HTTPS", category: "common", description: "HTTP Secure for encrypted web traffic." },
+            { number: 445, name: "SMB", category: "malicious", description: "Server Message Block, often exploited (e.g., WannaCry)." },
+            { number: 465, name: "SMTPS", category: "common", description: "SMTP over SSL for secure email." },
+            { number: 514, name: "Syslog", category: "common", description: "System Logging for event messages." },
+            { number: 587, name: "SMTP-MSA", category: "common", description: "SMTP Mail Submission Agent for email clients." },
+            { number: 993, name: "IMAPS", category: "common", description: "IMAP over SSL for secure email access." },
+            { number: 995, name: "POP3S", category: "common", description: "POP3 over SSL for secure email retrieval." },
+            { number: 1433, name: "MSSQL", category: "common", description: "Microsoft SQL Server database access." },
+            { number: 1521, name: "Oracle", category: "common", description: "Oracle Database default port." },
+            { number: 1723, name: "PPTP", category: "common", description: "Point-to-Point Tunneling Protocol for VPNs." },
+            { number: 2049, name: "NFS", category: "common", description: "Network File System for file sharing." },
+            { number: 3306, name: "MySQL", category: "common", description: "MySQL Database default port." },
+            { number: 3389, name: "RDP", category: "malicious", description: "Remote Desktop Protocol, frequent attack target." },
+            { number: 5060, name: "SIP", category: "common", description: "Session Initiation Protocol for VoIP." },
+            { number: 5432, name: "PostgreSQL", category: "common", description: "PostgreSQL Database default port." },
+            { number: 5900, name: "VNC", category: "malicious", description: "Virtual Network Computing, often exploited." },
+            { number: 6379, name: "Redis", category: "common", description: "Redis Database default port." },
+            { number: 8080, name: "HTTP-Alt", category: "common", description: "Alternative HTTP port, often for proxies or dev servers." },
+            { number: 8443, name: "HTTPS-Alt", category: "common", description: "Alternative HTTPS port for secure web traffic." },
+            { number: 27017, name: "MongoDB", category: "common", description: "MongoDB Database default port." },
+            { number: 1, name: "TCPMUX", category: "common", description: "TCP Port Service Multiplexer for service multiplexing." },
+    { number: 5, name: "RJE", category: "common", description: "Remote Job Entry, legacy protocol for job submission." },
+    { number: 11, name: "SYSTAT", category: "common", description: "System Status, provides system information." },
+    { number: 15, name: "NETSTAT", category: "common", description: "Network Statistics, legacy port (rarely used)." },
+    { number: 17, name: "QOTD", category: "common", description: "Quote of the Day, returns a short message." },
+    { number: 19, name: "Chargen", category: "common", description: "Character Generator, sends a stream of characters for testing." },
+    { number: 37, name: "Time", category: "common", description: "Time Protocol for basic time synchronization." },
+    { number: 39, name: "RLP", category: "common", description: "Resource Location Protocol, legacy resource discovery." },
+    { number: 42, name: "NAMESERVER", category: "common", description: "Host Name Server, legacy name resolution." },
+    { number: 43, name: "WHOIS", category: "common", description: "WHOIS protocol for domain information lookup." },
+    { number: 49, name: "TACACS", category: "common", description: "Terminal Access Controller Access-Control System." },
+    { number: 70, name: "Gopher", category: "common", description: "Gopher Protocol, legacy document retrieval system." },
+    { number: 79, name: "Finger", category: "common", description: "Finger Protocol, retrieves user information." },
+    { number: 81, name: "HOSTS2-NS", category: "common", description: "HOSTS2 Name Server, alternative HTTP port." },
+    { number: 101, name: "NICNAME", category: "common", description: "NIC Host Name Server, legacy WHOIS service." },
+    { number: 102, name: "ISO-TSAP", category: "common", description: "ISO Transport Service Access Point." },
+    { number: 107, name: "RTELNET", category: "common", description: "Remote Telnet Service, variant of Telnet." },
+    { number: 109, name: "POP2", category: "common", description: "Post Office Protocol v2, older email retrieval." },
+    { number: 111, name: "SUNRPC", category: "common", description: "Sun Remote Procedure Call, used by NFS." },
+    { number: 113, name: "IDENT", category: "common", description: "Identification Protocol for user authentication." },
+    { number: 115, name: "SFTP", category: "common", description: "Simple File Transfer Protocol (not SSH-based)." },
+    { number: 117, name: "UUCP", category: "common", description: "Unix-to-Unix Copy Protocol, legacy file transfer." },
+    { number: 119, name: "NNTP", category: "common", description: "Network News Transfer Protocol for Usenet." },
+    { number: 137, name: "NetBIOS-NS", category: "common", description: "NetBIOS Name Service for name resolution." },
+    { number: 138, name: "NetBIOS-DGM", category: "common", description: "NetBIOS Datagram Service for messaging." },
+    { number: 162, name: "SNMPTRAP", category: "common", description: "SNMP Trap for sending alerts." },
+    { number: 194, name: "IRC", category: "common", description: "Internet Relay Chat for messaging." },
+    { number: 201, name: "AppleTalk-RT", category: "common", description: "AppleTalk Routing, legacy Apple protocol." },
+    { number: 213, name: "IPX", category: "common", description: "Internetwork Packet Exchange, legacy Novell protocol." },
+    { number: 401, name: "UPS", category: "common", description: "Uninterruptible Power Supply management." },
+    { number: 427, name: "SLP", category: "common", description: "Service Location Protocol for device discovery." },
+    { number: 500, name: "ISAKMP", category: "common", description: "Internet Security Association and Key Management (VPN)." },
+    { number: 512, name: "REXEC", category: "malicious", description: "Remote Execution, unencrypted and exploitable." },
+    { number: 513, name: "RLOGIN", category: "malicious", description: "Remote Login, unencrypted and vulnerable." },
+    { number: 515, name: "LPD", category: "common", description: "Line Printer Daemon for printing." },
+    { number: 520, name: "RIP", category: "common", description: "Routing Information Protocol for routers." },
+    { number: 548, name: "AFP", category: "common", description: "Apple Filing Protocol for file sharing." },
+    { number: 554, name: "RTSP", category: "common", description: "Real-Time Streaming Protocol for media streaming." },
+    { number: 563, name: "NNTPS", category: "common", description: "NNTP over SSL for secure Usenet access." },
+    { number: 631, name: "IPP", category: "common", description: "Internet Printing Protocol for network printing." },
+    { number: 636, name: "LDAPS", category: "common", description: "LDAP over SSL for secure directory access." },
+    { number: 646, name: "LDP", category: "common", description: "Label Distribution Protocol for MPLS." },
+    { number: 873, name: "Rsync", category: "common", description: "Rsync Protocol for file synchronization." },
+    { number: 902, name: "VMware-Auth", category: "common", description: "VMware Authentication Daemon." },
+    { number: 1080, name: "SOCKS", category: "common", description: "SOCKS Proxy for network tunneling." },
+    { number: 1099, name: "RMI", category: "common", description: "Remote Method Invocation for Java applications." },
+    { number: 1194, name: "OpenVPN", category: "common", description: "OpenVPN default port for VPN connections." },
+    { number: 1701, name: "L2TP", category: "common", description: "Layer 2 Tunneling Protocol for VPNs." },
+    { number: 1812, name: "RADIUS-Auth", category: "common", description: "RADIUS Authentication for network access." },
+    { number: 1813, name: "RADIUS-Acct", category: "common", description: "RADIUS Accounting for usage tracking." },
+    { number: 1900, name: "SSDP", category: "common", description: "Simple Service Discovery Protocol for UPnP." },
+    { number: 2181, name: "ZooKeeper", category: "common", description: "Apache ZooKeeper for distributed coordination." },
+    { number: 2375, name: "Docker", category: "common", description: "Docker default port for container management." },
+    { number: 2483, name: "Oracle-TTC", category: "common", description: "Oracle Two-Task Communication." },
+    { number: 2525, name: "SMTP-Alt", category: "common", description: "Alternative SMTP port for email." },
+    { number: 2638, name: "Sybase", category: "common", description: "Sybase SQL Anywhere database." },
+    { number: 2948, name: "WAP-Push", category: "common", description: "Wireless Application Protocol Push." },
+    { number: 3050, name: "Firebird", category: "common", description: "Firebird SQL database default port." },
+    { number: 3128, name: "Squid", category: "common", description: "Squid Proxy default port." },
+    { number: 3260, name: "iSCSI", category: "common", description: "Internet Small Computer Systems Interface." },
+    { number: 3478, name: "STUN", category: "common", description: "Session Traversal Utilities for NAT (VoIP)." },
+    { number: 3544, name: "Teredo", category: "common", description: "Teredo Tunneling for IPv6 connectivity." },
+    { number: 3690, name: "SVN", category: "common", description: "Subversion version control system." },
+    { number: 4369, name: "Erlang-EPMD", category: "common", description: "Erlang Port Mapper Daemon." },
+    { number: 4500, name: "IPSec-NAT", category: "common", description: "IPSec NAT Traversal for VPNs." },
+    { number: 5000, name: "UPnP", category: "common", description: "Universal Plug and Play for device discovery." },
+    { number: 5222, name: "XMPP-Client", category: "common", description: "XMPP Client Connection for messaging." },
+    { number: 5223, name: "XMPP-SSL", category: "common", description: "XMPP over SSL for secure messaging." },
+    { number: 5631, name: "PCAnywhere", category: "malicious", description: "PCAnywhere, legacy remote access, often exploited." },
+    { number: 6667, name: "IRC-Alt", category: "common", description: "Alternative IRC port for chat services." },
+    { number: 6881, name: "BitTorrent", category: "common", description: "BitTorrent default port for peer-to-peer file sharing." },
+    { number: 8000, name: "HTTP-Alt2", category: "common", description: "Another alternative HTTP port for web services." },
+    { number: 8888, name: "HTTP-Alt3", category: "common", description: "Yet another alternative HTTP port, often for dev servers." },
+    { number: 9090, name: "WebSocket", category: "common", description: "Common WebSocket port for real-time communication." },
+    { number: 9200, name: "Elasticsearch", category: "common", description: "Elasticsearch default port for search and analytics." },
+    { number: 9418, name: "Git", category: "common", description: "Git protocol for version control repositories." },
+    { number: 11211, name: "Memcached", category: "common", description: "Memcached default port for caching." },
+    { number: 49152, name: "Ephemeral-Start", category: "common", description: "Start of ephemeral port range for temporary connections." },
+
+  //Blocked Home 
+  { number: 23, name: "Telnet", category: "blocked-home", description: "Unencrypted remote access, often exploited." },
+  { number: 135, name: "RPC", category: "blocked-home", description: "Remote Procedure Call, often targeted by exploits." },
+  { number: 137, name: "NetBIOS-NS", category: "blocked-home", description: "NetBIOS Name Service for name resolution, often targeted by malware." },
+  { number: 138, name: "NetBIOS-DGM", category: "blocked-home", description: "NetBIOS Datagram Service for messaging, can be exploited." },
+  { number: 139, name: "NetBIOS-SSN", category: "blocked-home", description: "NetBIOS Session Service, a target for exploits." },
+  { number: 445, name: "SMB", category: "blocked-home", description: "Server Message Block, often exploited (e.g., WannaCry)." },
+  { number: 3389, name: "RDP", category: "blocked-home", description: "Remote Desktop Protocol, frequent attack target." },
+  { number: 21, name: "FTP", category: "blocked-home", description: "File Transfer Protocol, vulnerable to attacks." },
+  { number: 69, name: "TFTP", category: "blocked-home", description: "Trivial File Transfer Protocol, easily exploitable." },
+  { number: 22, name: "SSH", category: "blocked-home", description: "Secure Shell for remote access, blocked in some home setups for security." },
+
+  //Blocked education
+  { number: 23, name: "Telnet", category: "blocked-education", description: "Unencrypted remote access, often exploited." },
+  { number: 135, name: "RPC", category: "blocked-education", description: "Remote Procedure Call, often targeted by exploits." },
+  { number: 137, name: "NetBIOS-NS", category: "blocked-education", description: "NetBIOS Name Service, often targeted by malware." },
+  { number: 138, name: "NetBIOS-DGM", category: "blocked-education", description: "NetBIOS Datagram Service for messaging, can be exploited." },
+  { number: 139, name: "NetBIOS-SSN", category: "blocked-education", description: "NetBIOS Session Service, a target for exploits." },
+  { number: 445, name: "SMB", category: "blocked-education", description: "Server Message Block, often exploited (e.g., WannaCry)." },
+  { number: 3389, name: "RDP", category: "blocked-education", description: "Remote Desktop Protocol, often blocked to prevent misuse in classrooms." },
+  { number: 21, name: "FTP", category: "blocked-education", description: "File Transfer Protocol, blocked to prevent file transfer exploits." },
+  { number: 22, name: "SSH", category: "blocked-education", description: "Secure Shell, blocked to prevent remote access misuse." },
+  { number: 5060, name: "SIP", category: "blocked-education", description: "Session Initiation Protocol, blocked to prevent VoIP misuse." },
+  { number: 3306, name: "MySQL", category: "blocked-education", description: "MySQL Database, often blocked for preventing unauthorized access." },
+  { number: 1433, name: "MSSQL", category: "blocked-education", description: "Microsoft SQL Server, can be targeted by cyberattacks." },
+
+  //Blocked work
+  { number: 23, name: "Telnet", category: "blocked-work", description: "Unencrypted remote access, often exploited." },
+  { number: 135, name: "RPC", category: "blocked-work", description: "Remote Procedure Call, often targeted by exploits." },
+  { number: 137, name: "NetBIOS-NS", category: "blocked-work", description: "NetBIOS Name Service, often targeted by malware." },
+  { number: 138, name: "NetBIOS-DGM", category: "blocked-work", description: "NetBIOS Datagram Service for messaging, can be exploited." },
+  { number: 139, name: "NetBIOS-SSN", category: "blocked-work", description: "NetBIOS Session Service, a target for exploits." },
+  { number: 445, name: "SMB", category: "blocked-work", description: "Server Message Block, often exploited (e.g., WannaCry)." },
+  { number: 3389, name: "RDP", category: "blocked-work", description: "Remote Desktop Protocol, often blocked in corporate networks." },
+  { number: 21, name: "FTP", category: "blocked-work", description: "File Transfer Protocol, blocked to prevent data leaks." },
+  { number: 22, name: "SSH", category: "blocked-work", description: "Secure Shell, often restricted to specific users for security." },
+  { number: 5060, name: "SIP", category: "blocked-work", description: "Session Initiation Protocol, blocked to prevent misuse." },
+  { number: 3306, name: "MySQL", category: "blocked-work", description: "MySQL Database, restricted to authorized personnel." },
+  { number: 1433, name: "MSSQL", category: "blocked-work", description: "Microsoft SQL Server, access controlled for security." },
+
+  //Blocked public
+  { number: 23, name: "Telnet", category: "blocked-public", description: "Unencrypted remote access, often exploited." },
+  { number: 135, name: "RPC", category: "blocked-public", description: "Remote Procedure Call, often targeted by exploits." },
+  { number: 137, name: "NetBIOS-NS", category: "blocked-public", description: "NetBIOS Name Service, often targeted by malware." },
+  { number: 138, name: "NetBIOS-DGM", category: "blocked-public", description: "NetBIOS Datagram Service for messaging, can be exploited." },
+  { number: 139, name: "NetBIOS-SSN", category: "blocked-public", description: "NetBIOS Session Service, a target for exploits." },
+  { number: 445, name: "SMB", category: "blocked-public", description: "Server Message Block, often exploited (e.g., WannaCry)." },
+  { number: 3389, name: "RDP", category: "blocked-public", description: "Remote Desktop Protocol, often blocked in public networks." },
+  { number: 21, name: "FTP", category: "blocked-public", description: "File Transfer Protocol, blocked to prevent unauthorized access." },
+  { number: 22, name: "SSH", category: "blocked-public", description: "Secure Shell, restricted to specific users for security." },
+  { number: 5060, name: "SIP", category: "blocked-public", description: "Session Initiation Protocol, often blocked in public networks." },
+  { number: 3306, name: "MySQL", category: "blocked-public", description: "MySQL Database, access controlled for security." },
+  { number: 1433, name: "MSSQL", category: "blocked-public", description: "Microsoft SQL Server, restricted to authorized users." }
+
+
+        ];
+// Function to render filtered ports in a table
+function renderPorts(filteredPorts) {
+    const portList = document.getElementById('port-list');
+    let html = '<table><tr><th>Port Number</th><th>Name</th><th>Category</th><th>Description</th></tr>';
+    
+    filteredPorts.forEach(port => {
+        html += `
+            <tr>
+                <td>${port.number}</td>
+                <td>${port.name}</td>
+                <td>${port.category}</td>
+                <td>
+                    <details>
+                        <summary>View Description</summary>
+                        <p>${port.description}</p>
+                    </details>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</table>';
+    portList.innerHTML = html;
+}
+
+// Function to search and filter ports based on category and search input
+function searchPorts() {
+    const searchValue = document.getElementById('search-port').value.toLowerCase();
+    const category = document.getElementById('port-category').value;
+    
+    let filteredPorts = ports.filter(port => {
+        const matchesSearch = port.number.toString().includes(searchValue) || 
+                                port.name.toLowerCase().includes(searchValue);
+        const matchesCategory = category === 'all' || port.category === category;
+        return matchesSearch && matchesCategory;
+    });
+    
+    renderPorts(filteredPorts);
+}
+
+// Function to filter ports based on category and search value
+function filterPorts() {
+    const category = document.getElementById('port-category').value;
+    const searchValue = document.getElementById('search-port').value.toLowerCase();
+    
+    let filteredPorts = ports.filter(port => {
+        const matchesSearch = port.number.toString().includes(searchValue) || 
+                                port.name.toLowerCase().includes(searchValue);
+        const matchesCategory = category === 'all' || port.category === category;
+        return matchesSearch && matchesCategory;
+    });
+    
+    renderPorts(filteredPorts);
+}
+
+        // Initial render
+        renderPorts(ports);
         // Whitelist and keywords
         const whitelistedDomains = [
             'youtube.com', 'google.com', 'github.com', 'wikipedia.org',
@@ -22112,7 +22488,7 @@
     "zzzregsizzz.com.ru",
     "twitch-gives.com"
 ] };
-let riskyLinks = [
+        let riskyLinks = [
     "http://win-money-now.xyz/claim",
     "http://verify-your-account-secure.com/login",
     "http://secure-update-now.com/verify-account",
