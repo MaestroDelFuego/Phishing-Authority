@@ -93,46 +93,6 @@ document.getElementById('passwordInput').addEventListener('input', function(e) {
         result.recommendations.map(rec => `<li>${rec}</li>`).join('') + 
         '</ul>';
 });
-// Hard-coded news articles with added date and image credit
-const newsArticles = [
-{
-    title: "Hackers Exploit New IoT Vulnerability to Access Smart Devices",
-    description: "A newly discovered vulnerability in Internet of Things (IoT) devices has been exploited by cybercriminals to gain unauthorized access to smart home gadgets. Experts are urging users to immediately update firmware to protect against potential threats.",
-    image: "https://c7.alamy.com/comp/PEPYE0/people-using-touch-screen-interfaces-augmented-reality-and-iot-devices-blockchain-of-things-and-networks-concept-PEPYE0.jpg",
-    date: "March 25, 2025",
-    imageCredit: "TechDaily News and Alarmy, used under Creative Commons License."
-},
-{
-    title: "Massive Data Breach Exposes Personal Information of Millions",
-    description: "A major data breach has compromised the personal information of millions of individuals, including social security numbers, emails, and bank account details. Authorities are working with affected companies to notify users and secure accounts.",
-    image: "https://media.istockphoto.com/id/1333874522/photo/hacker-attack-computer-hardware-microchip.jpg?s=612x612&w=0&k=20&c=SD8j9H_GtqbnuL4iz59yqZpnMku3SJRIMhwuC1rokqM=",
-    date: "March 24, 2025",
-    imageCredit: "InfoSec Times and IStock, used under Creative Commons License."
-},
-{
-    title: "Phishing Attack Mimics Government Emails to Steal Financial Data",
-    description: "A new wave of phishing attacks is targeting citizens by mimicking official government emails. The attackers are requesting personal financial information under the guise of providing stimulus payments. Users are advised to remain cautious and verify emails before responding.",
-    image: "https://media.istockphoto.com/id/956400244/vector/phishing-scam-hacker-attack.jpg?s=612x612&w=0&k=20&c=6adZZcKJdWO24xd05WH41Q362vGgny_w466y7Ds14Mk=",
-    date: "March 23, 2025",
-    imageCredit: "CyberNews Today and IStock, used under Creative Commons License."
-},
-{
-    title: "AI-Powered Malware Evades Traditional Antivirus Solutions",
-    description: "A new form of malware, powered by artificial intelligence, is increasingly evading traditional antivirus programs. Security researchers are warning businesses and individuals to upgrade to next-gen protection tools that incorporate AI-based threat detection systems.",
-    image: "https://www.shutterstock.com/image-photo/side-view-hacker-hoodie-using-laptop-2452475871",
-    date: "March 22, 2025",
-    imageCredit: "SecurityWatch and Shutterstock, used under Creative Commons License."
-},
-{
-    title: "Cybercriminals Target Cryptocurrency Wallets with New Ransomware",
-    description: "A new ransomware strain has emerged that specifically targets cryptocurrency wallets. The malware encrypts wallets and demands a ransom in digital assets to decrypt the funds. Experts suggest using multi-signature wallets for enhanced security.",
-    image: "https://www.shutterstock.com/image-photo/amsterdam-netherlands-august-30-2018-screenshot-1168020958",
-    date: "March 21, 2025",
-    imageCredit: "CoinSec News, used under Creative Commons License."
-}
-
-
-];
 function checkStrength() {
             const password = document.getElementById('password').value;
             const strengthBar = document.getElementById('strength-bar');
@@ -151,57 +111,6 @@ function checkStrength() {
             strengthBar.style.background = strengthColor[strength - 1] || 'lightgray';
             strengthText.innerText = strengthLabels[strength - 1] || '';
         }
-// Function to display news
-function displayNews() {
-    const newsList = document.getElementById("news-list");
-    newsList.innerHTML = ''; // Clear the list before displaying new content
-
-    newsArticles.forEach(article => {
-        // Create article element
-        const articleDiv = document.createElement("div");
-        articleDiv.classList.add("news-article");
-
-        // Add title
-        const titleElement = document.createElement("h3");
-        titleElement.innerText = article.title;
-        articleDiv.appendChild(titleElement);
-
-        // Add date
-        const dateElement = document.createElement("p");
-        dateElement.classList.add("news-date");
-        dateElement.innerText = `Published on: ${article.date}`;
-        articleDiv.appendChild(dateElement);
-
-        // Add description
-        const descriptionElement = document.createElement("p");
-        descriptionElement.innerText = article.description;
-        articleDiv.appendChild(descriptionElement);
-
-        // Add image
-        if (article.image) {
-            const imageElement = document.createElement("img");
-            imageElement.src = article.image;
-            imageElement.alt = article.title;
-            imageElement.style.width = '100%'; // Make the image responsive
-            articleDiv.appendChild(imageElement);
-        }
-
-        // Add image credit
-        const imageCreditElement = document.createElement("p");
-        imageCreditElement.classList.add("image-credit");
-        imageCreditElement.innerHTML = `<strong>Credit: </strong> ${article.imageCredit}`;
-        articleDiv.appendChild(imageCreditElement);
-
-        // Append the article to the news list
-        newsList.appendChild(articleDiv);
-
-        // Add separator (black line)
-        const separator = document.createElement("hr");
-        separator.style.border = "1px solid black"; // Style the separator
-        newsList.appendChild(separator);
-    });
-}
-displayNews();
         const ports = [
             { number: 7, name: "Echo", category: "common", description: "Used for testing network connectivity by echoing back data." },
             { number: 9, name: "Discard", category: "common", description: "Discards any data sent to it, used for testing." },
@@ -507,7 +416,10 @@ function filterPorts() {
             'pay-now', 'redemption', 'contest-winning', 'earn-money', 'exploits', 'money-making-scheme',
             'fake-prize', 'donate-now', 'scam-site', 'hoax-claim', 'cashback', 'invalid-account',
             'warning', 'blocked', 'secure-your-account', 'immediate-response', 'urgent-message',
-            'fraudulent', 'reclaim-money', 'fake-identity', 'check-status'
+            'fraudulent', 'reclaim-money', 'fake-identity', 'check-status', 'free', 'sexting', 'prize-winner',
+            'lottery', 'fake-claim', 'fake-identity', 'fake-transaction', 'fake-website', 'fake-email', 'newyear',
+            'nitro', 'discord', 'hypesquad', 'partner', 'academy', 'moderator', 'moderation', 'verification', 'form', 
+            'exam', 'test', 'signup', 'join', 'apply', 'invite', 'panel', 'partner', 'renew', 'requisite', 'subscription'
         ];
 
         // File handling (local storage simulation since FileSystem API is restricted)
@@ -22478,7 +22390,7 @@ function filterPorts() {
     'update-member-inhibit.vercel.app', 'updateyourattmail.wixsite.com', 'usercomplaintconversionexperts.vercel.app', 'vaibhavsanap112.github.io',
     'verifcatiosnmx.weebly.com', 'verify.pagedeleterequest.eu', 'victorious-noiseless-bronze.glitch.me', 'vinfrancis.es',
     'web-whatsa.cyou', 'whole.suejbx.net', 'worker-twilight-firefly-7adf.letusreviewymail.workers.dev', 'wotrega.fun', 
-    'zaganequabeu-5224-git-main-nicholascarter8467gs-projects.vercel.app'
+    'zaganequabeu-5224-git-main-nicholascarter8467gs-projects.vercel.app', "spoo.me", "getsolara.dev", "u.to", "shorter.me", "tenxzren.com", "discorbl.com"
 ] };
         let riskyLinks = [
     "http://win-money-now.xyz/claim",

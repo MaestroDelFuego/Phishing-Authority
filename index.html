@@ -25,9 +25,7 @@
     <div class="tab-container">
         <div class="tab" onclick="showTab('scan')">Scan URL</div>
         <div class="tab" onclick="showTab('blocked')">Blocked Domains</div>
-        <div class="tab" onclick="showTab('risky')">Risky Links</div>
         <div class="tab" onclick="showTab('ports')">Ports</div>
-        <div class="tab" onclick="showTab('news')">Cyber News</div>
         <div class="tab" onclick="showTab('password')">Password Generator</div>
         <div class="tab" onclick="showTab('passwordstrength')">Password Strength</div>
         <div class="tab" onclick="showTab('support')">Support</div>   
@@ -42,6 +40,7 @@
         <button onclick="scanUrl()">Scan</button>
         <div id="scan-result"></div>
         <p>Any score 30 or over is considered to be a probable cause for caution.</p>
+        <p>Found a link not detected by our algorthim? Report it to the devs in our discord server <a href="https://discord.gg/urd5mxBXcW" target="_blank">Here</a><</p>
     </div>
 
     <div id="password" class="content">
@@ -116,11 +115,6 @@
         <textarea id="blocked-list" readonly></textarea>
     </div>
 
-    <div id="risky" class="content">
-        <h2>Risky Links Log</h2>
-        <textarea id="risky-list" readonly></textarea>
-    </div>
-
     <div id="ports" class="content">
         <h2>Ports Information</h2>
         <label for="port-category">Select Category:</label>
@@ -147,16 +141,7 @@
             <div id="recommendations"></div>
         </div>
     </div>
-    
 
-<div id="news" class="content">
-    <h2>Security News and Alerts</h2>
-    
-    <!-- News List -->
-    <div id="news-list">
-        <!-- News Articles will be inserted here dynamically -->
-    </div>
-</div>
 <div id="disclaimers" class="content">
     <h2>Disclaimer</h2>
     <p><strong>Disclaimer:</strong> This tool is designed to analyze URL risk factors and provide security recommendations. However, it is important to understand that no tool can guarantee 100% protection from phishing attacks, malware, or other online threats. This tool should be used as an additional resource, *not as a substitute* for your own judgment, common sense, and cautious online behavior. Always apply critical thinking when browsing the web, and ensure you're following strong security practices such as verifying links, using trusted sources, and being cautious about sharing sensitive information. Remember: online security starts with you, and this tool is only one piece of the puzzle.</p>
