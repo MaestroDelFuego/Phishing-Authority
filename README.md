@@ -1,4 +1,4 @@
-Introducing Phishing Authority – your ultimate Discord bot designed to protect your community from phishing, scams, and malicious links! 🚨
+Introducing Phishing Authority – your ultimate tool designed to protect your community from phishing, scams, and malicious links! 🚨
 
 In today’s digital world, scams are more common than ever, and one wrong click can compromise your account or data. With Phishing Authority, you can rest easy knowing that your Discord server is being actively protected by a state-of-the-art phishing detection system. Here's why Phishing Authority is essential for your server:
 Key Features:
