@@ -392,7 +392,31 @@ function filterPorts() {
     // More popular services
     'zoom.com', 'tiktok.com', 'snapchat.com', 'pinterest.com', 'flickr.com', 'vimeo.com', 'spotify.com', 'soundcloud.com'
 ];
-
+const suspiciousDomains = [
+    ".dev",
+    ".to",
+    ".me",
+    ".fun",
+    ".icu",
+    ".ru",
+    ".gq",
+    ".ml",
+    ".club",
+    ".link",
+    ".ink",
+    ".space",
+    ".cc",
+    ".site",
+    ".ph",
+    ".tk",
+    ".tax",
+    ".skin",
+    ".land",
+    ".pro",
+    ".ga",
+    ".online",
+    ".xin"
+];
         const suspiciousKeywords = [
             'login', 'secure', 'update', 'verify', 'account', 'signin', 'password', 'payment',
             'gift-card', 'offer', 'credit', 'free', 'bonus', 'survey', 'click', 'win', 'cash',
@@ -22390,7 +22414,8 @@ function filterPorts() {
     'update-member-inhibit.vercel.app', 'updateyourattmail.wixsite.com', 'usercomplaintconversionexperts.vercel.app', 'vaibhavsanap112.github.io',
     'verifcatiosnmx.weebly.com', 'verify.pagedeleterequest.eu', 'victorious-noiseless-bronze.glitch.me', 'vinfrancis.es',
     'web-whatsa.cyou', 'whole.suejbx.net', 'worker-twilight-firefly-7adf.letusreviewymail.workers.dev', 'wotrega.fun', 
-    'zaganequabeu-5224-git-main-nicholascarter8467gs-projects.vercel.app', "spoo.me", "getsolara.dev", "u.to", "shorter.me", "tenxzren.com", "discorbl.com", "evri.psocysdsc.xin"
+    'zaganequabeu-5224-git-main-nicholascarter8467gs-projects.vercel.app', "spoo.me", "getsolara.dev", "u.to", "shorter.me",
+    "tenxzren.com", "discorbl.com", "evri.psocysdsc.xin"
 ] };
         let riskyLinks = [
     "http://win-money-now.xyz/claim",
@@ -22446,25 +22471,39 @@ function filterPorts() {
             return -prob.reduce((sum, p) => sum + p * Math.log2(p), 0);
         }
 
+        function findSuspiciousDomains(urls) {
+            return urls.filter(url => suspiciousDomains.some(domain => url.endsWith(domain)));
+        }
+
         function calculateRisk(url) {
             let risk = 0;
             const parsed = new URL(url.startsWith('http') ? url : 'http://' + url);
-            let domain = parsed.hostname.toLowerCase().replace('www.', '');
+            let domain = parsed.hostname.toLowerCase().replace(/^www\./, ''); // Ensure www. is removed properly
             const fullUrl = (domain + parsed.pathname + parsed.search).toLowerCase();
-
+        
+            // Increase risk for HTTP (not HTTPS)
             if (parsed.protocol === 'http:') risk += 40;
+        
+            // Increase risk if the domain is not whitelisted
             if (!whitelistedDomains.includes(domain)) risk += 20;
+        
+            // Increase risk for suspicious keywords
             suspiciousKeywords.forEach(keyword => {
                 if (fullUrl.includes(keyword)) risk += 30;
             });
-
+        
+            // Check for suspicious domain extensions
+            suspiciousDomains.forEach(suspicious => {
+                if (domain.endsWith(suspicious)) risk += 30;
+            });
+        
             // Check if the domain is blocked
             if (blockedDomains.domains.includes(domain)) {
                 console.log(`Blocked domain detected: ${domain}`);  // Debugging line
                 risk += 100;  // Assign 100 if the domain is blocked
                 alert("This domain has been detected by our team and exists in our blocked domains section. Do not interact with it!");
             }
-
+        
             return risk;
         }
 
