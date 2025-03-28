@@ -1,3 +1,4 @@
+showTab('scan');
 function checkPasswordStrength(password) {
     // Initialize variables
     let strength = 0;
@@ -22477,24 +22478,25 @@ const suspiciousDomains = [
 
         function calculateRisk(url) {
             let risk = 0;
+            let reasons = []; // Store reasons for the risk score
             const parsed = new URL(url.startsWith('http') ? url : 'http://' + url);
             let domain = parsed.hostname.toLowerCase().replace(/^www\./, ''); // Ensure www. is removed properly
             const fullUrl = (domain + parsed.pathname + parsed.search).toLowerCase();
         
             // Increase risk for HTTP (not HTTPS)
-            if (parsed.protocol === 'http:') risk += 40;
+            if (parsed.protocol === 'http:') { risk += 40; reasons.push("Uses HTTP instead of HTTPS (less secure).\n"); } 
         
             // Increase risk if the domain is not whitelisted
-            if (!whitelistedDomains.includes(domain)) risk += 20;
+            if (!whitelistedDomains.includes(domain)){ risk += 20; reasons.push("Domain is not in the trusted whitelist.\n"); }
         
             // Increase risk for suspicious keywords
             suspiciousKeywords.forEach(keyword => {
-                if (fullUrl.includes(keyword)) risk += 30;
+                if (fullUrl.includes(keyword)){ risk += 30; reasons.push(`Contains suspicious keyword: '${keyword}'.\n`); }
             });
         
             // Check for suspicious domain extensions
             suspiciousDomains.forEach(suspicious => {
-                if (domain.endsWith(suspicious)) risk += 30;
+                if (domain.endsWith(suspicious)){ risk += 30;reasons.push(`Domain has a suspicious extension: '${suspicious}'.\n`); } 
             });
         
             // Check if the domain is blocked
@@ -22502,7 +22504,35 @@ const suspiciousDomains = [
                 console.log(`Blocked domain detected: ${domain}`);  // Debugging line
                 risk += 100;  // Assign 100 if the domain is blocked
                 alert("This domain has been detected by our team and exists in our blocked domains section. Do not interact with it!");
+                reasons.push(`Domain is explicitly **BLOCKED** (${domain}).\n`);
             }
+            // Determine if the URL is safe or risky based on the score
+            let safetyMessage = '';
+            if (risk === 0) {
+                safetyMessage = "<strong>This URL appears to be safe!</strong>";
+            } else if (risk <= 50) {
+                safetyMessage = "<strong>Risk level: Low</strong>. Proceed with caution.";
+            } else if (risk <= 100) {
+                safetyMessage = "<strong>Risk level: Medium</strong>. Be cautious when interacting with this URL.";
+            } else {
+                safetyMessage = "<strong>Risk level: High</strong>. This URL is highly suspicious, do not interact with it!";
+            }
+            // Update the scan-reason div with the detailed breakdown
+            const reasonText = `
+                <br>
+                <h3>Risk Assessment:</h3>
+                <p><strong>Total Risk Score: ${risk}</strong></p>
+                <p>${safetyMessage}</p>
+                <ul>
+                ${reasons.map(reason => `<li>${reason}</li>`).join('')}
+                </ul>
+                <br>
+                <h3>Is this URL being falsely flagged? Report it in our <a href="https://discord.gg/urd5mxBXcW" target="_blank">Discord Here</a></h3>
+                <br>
+                <br>
+            `;
+
+            document.getElementById("scan-reason").innerHTML = reasonText;  // Display in the div
         
             return risk;
         }

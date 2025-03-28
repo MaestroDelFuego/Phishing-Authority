@@ -22,7 +22,7 @@ body {
 .site-container {
     background: rgba(23, 42, 94, 0.6);
     border-radius: 20px;
-    backdrop-filter: blur(20px);
+    /*backdrop-filter: blur(20px);*/
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     width: 95%;
     max-width: 950px;
@@ -232,4 +232,29 @@ a:hover {
 
 #strengthText, #timeToCrack, #recommendations {
     margin-top: 10px;
+}
+
+#scan-reason{
+    background-color: rgba(0, 0, 0, 0.1);  /* Light background with slight transparency */
+    border-radius: 15px;  /* Rounded corners */
+    padding: 20px;  /* Padding inside the box */
+    max-width: 600px;  /* Maximum width for the box */
+    margin: 20px auto;  /* Center the box on the page */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow around the box */
+    font-family: Arial, sans-serif;  /* Clean, modern font */
+    color: #ffffff;  /* Text color */
+    background: #0a0f24;
+    border: 1px solid #000000;  /* Light border around the box */
+    
+}
+
+ul{
+    list-style-type: none;  /* Remove default bullet points */
+    margin-bottom: 20px; /* Add gap between list items */
+}
+
+#support ul {
+    list-style-type: none;  /* Remove the default bullet points */
+    padding: 0;  /* Remove any padding */
+    margin: 0;  /* Remove any margin */
 }
