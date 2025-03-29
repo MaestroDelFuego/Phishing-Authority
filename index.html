@@ -28,6 +28,7 @@
         <div class="tab" onclick="showTab('ports')">Ports</div>
         <div class="tab" onclick="showTab('password')">Password Generator</div>
         <div class="tab" onclick="showTab('passwordstrength')">Password Strength</div>
+        <div class="tab" onclick="window.location.href='https://cdn.discordapp.com/attachments/1351689598597861378/1355607214295093478/PhishingAuthorityAPP.zip?ex=67e98b19&is=67e83999&hm=5d21f3732aa13eccd785568c2f61668a7315578c99445e1b815407b3dd2e73c1&'">Download</div>
         <div class="tab" onclick="showTab('support')">Support</div>   
         <div class="tab" onclick="showTab('disclaimers')">Disclaimers</div>    
     </div>
@@ -142,6 +143,16 @@
             <div id="timeToCrack"></div>
             <div id="recommendations"></div>
         </div>
+    </div>
+
+    <div id="hsf" class="content">
+        <div class="tab" onclick="showTab('hsf')">Hash scan file</div> 
+        <h2>Upload a File to Scan</h2>
+        <form id="fileForm" enctype="multipart/form-data">
+            <input type="file" id="fileInput" required />
+            <button type="submit">Scan File</button>
+        </form>
+        <div id="hsfscanResult"></div>
     </div>
 
 <div id="disclaimers" class="content">
